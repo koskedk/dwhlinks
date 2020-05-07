@@ -96,7 +96,7 @@
             <!--ART DATA QUALITY -->
              <li id="artdataquality-dashboards" data-toggle="tooltip" data-placement="right" data-original-title="ART Data Quality">
                 <a href="@Url.Action("Dashboard_1", "Dashboards")"><i class="fa fa-square"></i> <span class="nav-label" data-i18n="nav.dashboard">ART Data Quality</span> <span class="fa arrow"></span></a>
-                <ul class="nav nav-second-level collapse "
+                <ul class="nav nav-second-level collapse ">
                         @foreach (var workbook in Model)
                         {
                             if (@workbook.Name == "Danielson- 12 Month Retention")
@@ -119,7 +119,7 @@
                                 </ul>
                             }
                         }
-              </ul>
+                </ul>
 
             </li>
 			<!-- Data Alignment -->
