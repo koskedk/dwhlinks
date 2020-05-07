@@ -93,6 +93,35 @@
 
             </li>
 
+            <!--ART DATA QUALITY -->
+             <li id="artdataquality-dashboards" data-toggle="tooltip" data-placement="right" data-original-title="ART Data Quality">
+                <a href="@Url.Action("Dashboard_1", "Dashboards")"><i class="fa fa-square"></i> <span class="nav-label" data-i18n="nav.dashboard">ART Data Quality</span> <span class="fa arrow"></span></a>
+                <ul class="nav nav-second-level collapse "
+                        @foreach (var workbook in Model)
+                        {
+                            if (@workbook.Name == "Danielson- 12 Month Retention")
+                            {
+                                continue;
+                            }
+                            else
+                            {
+                                <ul class="nav nav-third-level">
+                                    @foreach (var view in workbook.Views)
+                                    {
+                                        if (@view.Name.ToLower().Contains("dashboard") &&
+                                            @view.Name.ToLower().Contains("live") &&
+                                            @view.Name.ToLower().Contains("implementation") && @view.Name.Contains(":"))
+                                        {
+                                            <li id="@view.Id" onclick="loadDashboard('tableauImage', '@view.InteractiveUrl', '@view.Name')"><a href="#"><i class="fa fa-caret-right" aria-hidden="true"></i> @view.Name.Split(':')[2]</a></li>
+
+                                        }
+                                    }
+                                </ul>
+                            }
+                        }
+              </ul>
+
+            </li>
 			<!-- Data Alignment -->
             <li id="DataAlignment-dashboards" data-toggle="tooltip" data-placement="right" data-original-title="Data Alignment">
                 <a href="@Url.Action("Dashboard_1", "Dashboards")"><i class="fa fa-bar-chart"></i> <span class="nav-label" data-i18n="nav.dashboard">Data Alignment</span> <span class="fa arrow"></span></a>
@@ -414,33 +443,7 @@
                             }
                         }
                     </li>
-
-                    <!--EMR Implementations -->
-                    <li>
-                        <a href="#" id="damian"> EMR Data Quality and Reporting Rates  <span class="fa arrow"></span></a>
-                        @foreach (var workbook in Model)
-                        {
-                            if (@workbook.Name == "Danielson- 12 Month Retention")
-                            {
-                                continue;
-                            }
-                            else
-                            {
-                                <ul class="nav nav-third-level">
-                                    @foreach (var view in workbook.Views)
-                                    {
-                                        if (@view.Name.ToLower().Contains("dashboard") &&
-                                            @view.Name.ToLower().Contains("live") &&
-                                            @view.Name.ToLower().Contains("implementation") && @view.Name.Contains(":"))
-                                        {
-                                            <li id="@view.Id" onclick="loadDashboard('tableauImage', '@view.InteractiveUrl', '@view.Name')"><a href="#"><i class="fa fa-caret-right" aria-hidden="true"></i> @view.Name.Split(':')[2]</a></li>
-
-                                        }
-                                    }
-                                </ul>
-                            }
-                        }
-                    </li>
+ 
                 </ul>
 
             </li>
