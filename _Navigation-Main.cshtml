@@ -1,0 +1,786 @@
+﻿@using DWHDashboard.ProfileManagement.Core.Model
+@using DWHDashboard.Web.Helpers
+@model IEnumerable<DWHDashboard.Web.Models.Workbook>
+@{
+    var user = Session["User"];
+    if (null != user)
+    {
+        var currentUser = (User)user;
+        ViewBag.CurrentUser = currentUser.UserName;
+        ViewBag.PersonName = currentUser.FullName;
+    }
+}
+
+<nav class="navbar-default navbar-static-side" role="navigation">
+    @{ string views = ""; }
+    <div class="gray-bg" style="padding: 8px 1px 1px 4px;height: 100px">
+        <p style="text-align:center;"><img src="~/Images/org/dwh2.png" width="180"></p>
+    </div>
+    <div class="sidebar-collapse">
+
+        <ul class="nav metismenu tooltip-demo" id="side-menu">
+            <li class="nav-header">
+
+                <div class="dropdown profile-element">
+
+                    <a data-toggle="dropdown" class="dropdown-toggle" href="#">
+                        <span class="clear">
+                            <span class="block m-t-xs">
+                                <strong class="font-bold">@ViewBag.PersonName</strong>
+                            </span> <span class="text-muted text-xs block">Data Warehouse<b class="caret"></b></span>
+                        </span>
+                    </a>
+                    <ul class="dropdown-menu animated fadeInRight m-t-xs">
+                        <li><a href="#">Profile</a></li>
+                        <li class="divider"></li>
+                        <li class="@Html.ShowAreaIf(true, UserType.Admin, UserType.Steward, UserType.Normal, UserType.None, UserType.GisAdmin)">
+                            <a href="@Url.Action("LogOut", "Account")">Log Out</a>
+                        </li>
+                        <li class="@Html.ShowAreaIf(false, UserType.Guest)">
+                            <a href="@Url.Action("Login", "Account")">Login</a>
+                        </li>
+                    </ul>
+
+                </div>
+
+            </li>
+            @*<li><hr style="background-color: aliceblue;" /></li>*@
+            <li class="special_link">
+                <a href="#" class="navbar-minimalize" data-toggle="tooltip" data-placement="right" data-original-title="Expand"><i class="fa fa-bars"></i> <span class="nav-label">Collapse</span></a>
+                @*<a href="#" class="navbar-minimalize minimalize-styl-2"><i class="fa fa-bars"></i><span class="nav-label">Collapse</span></a>*@
+            </li>
+            <!-- Home -->
+            <li id="home" data-toggle="tooltip" data-placement="right" data-original-title="Home">
+                <a href="@Url.Content("~/")"><i class="fa fa-home" aria-hidden="true"></i> <span class="nav-label" data-i18n="nav.dashboard">Home</span></a>
+            </li>
+
+            <!-- SPOT -->
+            <li id="Spot" data-toggle="tooltip" data-placement="right" data-original-title="Spot">
+                <a href="@Url.Action("Index", "Spot")"><i class="fa fa-heartbeat" style="color:yellow; font-size: x-large" aria-hidden="true"></i> <span class="nav-label" data-i18n="nav.dashboard">Spot</span></a>
+            </li>
+
+            <!-- REPORTING RATES -->
+            <li id="ReportingRates-dashboards" data-toggle="tooltip" data-placement="right" data-original-title="Reporting Rates">
+                <a href="@Url.Action("Dashboard_1", "Dashboards")"><i class="fa fa-bar-chart"></i> <span class="nav-label" data-i18n="nav.dashboard">Reporting Rates</span> <span class="fa arrow"></span></a>
+                <ul class="nav nav-second-level collapse ">
+                    <!--General-->
+
+                    @foreach (var workbook in Model)
+                    {
+                        if (@workbook.Name == "Danielson- 12 Month Retention")
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            <ul class="nav nav-third-level">
+                                @foreach (var view in workbook.Views)
+                                {
+                                    if (@view.Name.ToLower().Contains("dashboard") &&
+                                        !@view.Name.ToLower().Contains("live") &&
+                                        @view.Name.ToLower().Contains("reporting") &&
+                                        @view.Name.ToLower().Contains("rate") && @view.Name.Contains(":"))
+                                    {
+                                        <li id="@view.Id" onclick="loadDashboard('tableauImage', '@view.InteractiveUrl', '@view.Name')"><a href="#"><i class="fa fa-caret-right" aria-hidden="true"></i> @(view.Name.Split(':').Length>2?@view.Name.Split(':')[2]:@view.Name.Split(':')[1])</a></li>
+
+                                    }
+                                }
+                            </ul>
+                        }
+                    }
+
+                </ul>
+
+            </li>
+			
+			<!-- Data Alignment -->
+            <li id="DataAlignment-dashboards" data-toggle="tooltip" data-placement="right" data-original-title="Data Alignment">
+                <a href="@Url.Action("Dashboard_1", "Dashboards")"><i class="fa fa-bar-chart"></i> <span class="nav-label" data-i18n="nav.dashboard">Data Alignment</span> <span class="fa arrow"></span></a>
+                <ul class="nav nav-second-level collapse ">
+                    <!--General-->
+
+                    @foreach (var workbook in Model)
+                    {
+                        if (@workbook.Name == "Danielson- 12 Month Retention")
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            <ul class="nav nav-third-level">
+                                @foreach (var view in workbook.Views)
+                                {
+                                    if (@view.Name.ToLower().Contains("dashboard") &&
+                                        !@view.Name.ToLower().Contains("live") &&
+                                        @view.Name.ToLower().Contains("data") &&
+                                        @view.Name.ToLower().Contains("alignment") && @view.Name.Contains(":"))
+                                    {
+                                        <li id="@view.Id" onclick="loadDashboard('tableauImage', '@view.InteractiveUrl', '@view.Name')"><a href="#"><i class="fa fa-caret-right" aria-hidden="true"></i> @(view.Name.Split(':').Length>2?@view.Name.Split(':')[2]:@view.Name.Split(':')[1])</a></li>
+
+                                    }
+                                }
+                            </ul>
+                        }
+                    }
+
+                </ul>
+
+            </li>
+
+            <!-- PUBLISHED -->
+            <li id="archived-dashboards" data-toggle="tooltip" data-placement="right" data-original-title="Published">
+                <a href="@Url.Action("Dashboard_1", "Dashboards")"><i class="fa fa-files-o"></i> <span class="nav-label" data-i18n="nav.dashboard">Published</span> <span class="fa arrow"></span></a>
+                <ul class="nav nav-second-level collapse ">
+                    <!--General-->
+                    <li class="@Html.ShowDashboard("general", Model)">
+                        <a href="#" id="damian"> General <span class="fa arrow"></span></a>
+                        @foreach (var workbook in Model)
+                        {
+                            if (@workbook.Name == "Danielson- 12 Month Retention")
+                            {
+                                continue;
+                            }
+                            else
+                            {
+                                <ul class="nav nav-third-level">
+                                    @foreach (var view in workbook.Views)
+                                    {
+                                        if (@view.Name.ToLower().Contains("dashboard") &&
+                                            !@view.Name.ToLower().Contains("live") &&
+                                            @view.Name.ToLower().Contains("general") && @view.Name.Contains(":"))
+                                        {
+                                            <li id="@view.Id" onclick="loadDashboard('tableauImage', '@view.InteractiveUrl', '@view.Name')"><a href="#"><i class="fa fa-caret-right" aria-hidden="true"></i> @view.Name.Split(':')[1]</a></li>
+
+                                        }
+                                    }
+                                </ul>
+                            }
+                        }
+                    </li>
+
+                    <!-- cohort 2014 -->
+                    <li class="@Html.ShowDashboard("2014", Model)">
+                        <a href="#" id="damian"> 2014 Cohort<span class="fa arrow"></span></a>
+                        @foreach (var workbook in Model)
+                        {
+                            if (@workbook.Name == "Danielson- 12 Month Retention")
+                            {
+                                continue;
+                            }
+                            else
+                            {
+                                <ul class="nav nav-third-level">
+                                    @foreach (var view in workbook.Views)
+                                    {
+                                        if (@view.Name.ToLower().Contains("dashboard") &&
+                                            !@view.Name.ToLower().Contains("live") &&
+                                            @view.Name.ToLower().Contains("cohort") &&
+                                            @view.Name.ToLower().Contains("2014") && @view.Name.Contains(":"))
+                                        {
+                                            <li id="@view.Id" onclick="loadDashboard('tableauImage', '@view.InteractiveUrl', '@view.Name')"><a href="#"><i class="fa fa-caret-right" aria-hidden="true"></i> @view.Name.Split(':')[1]</a></li>
+
+                                        }
+                                    }
+                                </ul>
+                            }
+                        }
+                    </li>
+
+
+                    <!-- cohort 2015 -->
+                    <li class="@Html.ShowDashboard("2015", Model)">
+                        <a href="#" id="damian"> 2015 Cohort<span class="fa arrow"></span></a>
+                        @foreach (var workbook in Model)
+                        {
+                            if (@workbook.Name == "Danielson- 12 Month Retention")
+                            {
+                                continue;
+                            }
+                            else
+                            {
+                                <ul class="nav nav-third-level">
+                                    @foreach (var view in workbook.Views)
+                                    {
+                                        if (@view.Name.ToLower().Contains("dashboard") &&
+                                            !@view.Name.ToLower().Contains("live") &&
+                                            @view.Name.ToLower().Contains("cohort") &&
+                                            @view.Name.ToLower().Contains("2015") && @view.Name.Contains(":"))
+                                        {
+                                            <li id="@view.Id" onclick="loadDashboard('tableauImage', '@view.InteractiveUrl', '@view.Name')"><a href="#"><i class="fa fa-caret-right" aria-hidden="true"></i> @view.Name.Split(':')[1]</a></li>
+
+                                        }
+                                    }
+                                </ul>
+                            }
+                        }
+                    </li>
+
+                    <!-- cohort 2016 -->
+                    <li class="@Html.ShowDashboard("2016", Model)">
+                        <a href="#" id="damian"> 2016 Cohort<span class="fa arrow"></span></a>
+                        @foreach (var workbook in Model)
+                        {
+                            if (@workbook.Name == "Danielson- 12 Month Retention")
+                            {
+                                continue;
+                            }
+                            else
+                            {
+                                <ul class="nav nav-third-level">
+                                    @foreach (var view in workbook.Views)
+                                    {
+                                        if (@view.Name.ToLower().Contains("dashboard") &&
+                                            !@view.Name.ToLower().Contains("live") &&
+                                            @view.Name.ToLower().Contains("cohort") &&
+                                            @view.Name.ToLower().Contains("2016") && @view.Name.Contains(":"))
+                                        {
+                                            <li id="@view.Id" onclick="loadDashboard('tableauImage', '@view.InteractiveUrl', '@view.Name')"><a href="#"><i class="fa fa-caret-right" aria-hidden="true"></i> @view.Name.Split(':')[1]</a></li>
+
+                                        }
+                                    }
+                                </ul>
+                            }
+                        }
+                    </li>
+
+                    <!-- cohort 2017 -->
+                    <li class="@Html.ShowDashboard("2017", Model)">
+                        <a href="#" id="damian"> 2017 Cohort<span class="fa arrow"></span></a>
+                        @foreach (var workbook in Model)
+                        {
+                            if (@workbook.Name == "Danielson- 12 Month Retention")
+                            {
+                                continue;
+                            }
+                            else
+                            {
+                                <ul class="nav nav-third-level">
+                                    @foreach (var view in workbook.Views)
+                                    {
+                                        if (@view.Name.ToLower().Contains("dashboard") &&
+                                            !@view.Name.ToLower().Contains("live") &&
+                                            @view.Name.ToLower().Contains("cohort") &&
+                                            @view.Name.ToLower().Contains("2017") && @view.Name.Contains(":"))
+                                        {
+                                            <li id="@view.Id" onclick="loadDashboard('tableauImage', '@view.InteractiveUrl', '@view.Name')"><a href="#"><i class="fa fa-caret-right" aria-hidden="true"></i> @view.Name.Split(':')[1]</a></li>
+
+                                        }
+                                    }
+                                </ul>
+                            }
+                        }
+                    </li>
+
+                    <!-- COP -->
+                    <li class="@Html.ShowDashboard("cop", Model)">
+                        <a href="#" id="damian"> COP <span class="fa arrow"></span></a>
+                        @foreach (var workbook in Model)
+                        {
+                            if (@workbook.Name == "Danielson- 12 Month Retention")
+                            {
+                                continue;
+                            }
+                            else
+                            {
+                                <ul class="nav nav-third-level">
+                                    @foreach (var view in workbook.Views)
+                                    {
+                                        if (@view.Name.ToLower().Contains("dashboard") &&
+                                            !@view.Name.ToLower().Contains("live") &&
+                                            @view.Name.ToLower().Contains("cop") && @view.Name.Contains(":"))
+                                        {
+                                            <li id="@view.Id" onclick="loadDashboard('tableauImage', '@view.InteractiveUrl', '@view.Name')"><a href="#"><i class="fa fa-caret-right" aria-hidden="true"></i> @view.Name.Split(':')[1]</a></li>
+
+                                        }
+                                    }
+                                </ul>
+                            }
+                        }
+                    </li>
+
+                    <!-- GAPR -->
+                    <li class="@Html.ShowDashboard("gapr", Model)">
+                        <a href="#" id="damian"> GAPR <span class="fa arrow"></span></a>
+                        @foreach (var workbook in Model)
+                        {
+                            if (@workbook.Name == "Danielson- 12 Month Retention")
+                            {
+                                continue;
+                            }
+                            else
+                            {
+                                <ul class="nav nav-third-level" id="hideempty">
+                                    @foreach (var view in workbook.Views)
+                                    {
+                                        if (@view.Name.ToLower().Contains("dashboard") &&
+                                            !@view.Name.ToLower().Contains("live") &&
+                                            @view.Name.ToLower().Contains("gapr") && @view.Name.Contains(":"))
+                                        {
+                                            <li id="@view.Id" onclick="loadDashboard('tableauImage', '@view.InteractiveUrl', '@view.Name')"><a href="#"><i class="fa fa-caret-right" aria-hidden="true"></i> @view.Name.Split(':')[1]</a></li>
+                                        }
+
+                                    }
+                                </ul>
+                            }
+                        }
+                    </li>
+
+                    <!-- EMR Implementation -->
+                    <li class="@Html.ShowDashboard("implementation", Model)">
+                        <a href="#" id="damian"> EMR Implementation <span class="fa arrow"></span></a>
+                        @foreach (var workbook in Model)
+                        {
+                            if (@workbook.Name == "Danielson- 12 Month Retention")
+                            {
+                                continue;
+                            }
+                            else
+                            {
+                                <ul class="nav nav-third-level">
+                                    @foreach (var view in workbook.Views)
+                                    {
+                                        if (@view.Name.ToLower().Contains("dashboard") &&
+                                            !@view.Name.ToLower().Contains("live") &&
+                                            @view.Name.ToLower().Contains("implementation") && @view.Name.Contains(":"))
+                                        {
+                                            <li id="@view.Id" onclick="loadDashboard('tableauImage', '@view.InteractiveUrl', '@view.Name')"><a href="#"> <i class="fa fa-caret-right" aria-hidden="true"></i> @view.Name.Split(':')[1]</a></li>
+
+                                        }
+                                    }
+                                </ul>
+                            }
+                        }
+                    </li>
+                </ul>
+            </li>
+
+            <!-- LIVE SECTION -->
+            @* MG:25-Apr-2019 Make public *@
+            @*  <li id="live-dashboards" data-toggle="tooltip" data-placement="right" data-original-title="Live" class="@Html.ShowAreaIf(true,UserType.Admin,UserType.Steward,UserType.Normal, UserType.GisAdmin)">*@
+            <li id="live-dashboards" data-toggle="tooltip" data-placement="right" data-original-title="Live">
+                <a href="@Url.Action("Dashboard_1", "Dashboards")"><i class="fa fa-rss" style="font-size: larger;"></i> <span class="nav-label" data-i18n="nav.dashboard">Live</span> <span class="fa arrow"></span></a>
+                <ul class="nav nav-second-level collapse">
+                    <!--General-->
+                    <li>
+                        <a href="#" id="damian"> General <span class="fa arrow"></span></a>
+                        @foreach (var workbook in Model)
+                        {
+                            if (@workbook.Name == "Danielson- 12 Month Retention")
+                            {
+                                continue;
+                            }
+                            else
+                            {
+                                <ul class="nav nav-third-level">
+                                    @foreach (var view in workbook.Views)
+                                    {
+                                        if (@view.Name.ToLower().Contains("dashboard") &&
+                                            @view.Name.ToLower().Contains("live") &&
+                                            @view.Name.ToLower().Contains("general") && @view.Name.Contains(":"))
+                                        {
+                                            <li id="@view.Id" onclick="loadDashboard('tableauImage', '@view.InteractiveUrl', '@view.Name')"><a href="#"><i class="fa fa-caret-right" aria-hidden="true"></i> @view.Name.Split(':')[2]</a></li>
+
+                                        }
+                                    }
+                                </ul>
+                            }
+                        }
+                    </li>
+
+                    <!--Cohort-->
+                    <li>
+                        <a href="to#" id="damian"> Cohort <span class="fa arrow"></span></a>
+                        @foreach (var workbook in Model)
+                        {
+                            if (@workbook.Name == "Danielson- 12 Month Retention")
+                            {
+                                continue;
+                            }
+                            else
+                            {
+                                <ul class="nav nav-third-level">
+                                    @foreach (var view in workbook.Views)
+                                    {
+                                        if (@view.Name.ToLower().Contains("dashboard") &&
+                                            @view.Name.ToLower().Contains("live") &&
+                                            @view.Name.ToLower().Contains("cohort") && @view.Name.Contains(":"))
+                                        {
+                                            <li id="@view.Id" onclick="loadDashboard('tableauImage', '@view.InteractiveUrl', '@view.Name')"><a href="#"><i class="fa fa-caret-right" aria-hidden="true"></i> @view.Name.Split(':')[2]</a></li>
+
+                                        }
+                                    }
+                                </ul>
+                            }
+                        }
+                    </li>
+
+                    <!--EMR Implementations -->
+                    <li>
+                        <a href="#" id="damian"> EMR Data Quality and Reporting Rates  <span class="fa arrow"></span></a>
+                        @foreach (var workbook in Model)
+                        {
+                            if (@workbook.Name == "Danielson- 12 Month Retention")
+                            {
+                                continue;
+                            }
+                            else
+                            {
+                                <ul class="nav nav-third-level">
+                                    @foreach (var view in workbook.Views)
+                                    {
+                                        if (@view.Name.ToLower().Contains("dashboard") &&
+                                            @view.Name.ToLower().Contains("live") &&
+                                            @view.Name.ToLower().Contains("implementation") && @view.Name.Contains(":"))
+                                        {
+                                            <li id="@view.Id" onclick="loadDashboard('tableauImage', '@view.InteractiveUrl', '@view.Name')"><a href="#"><i class="fa fa-caret-right" aria-hidden="true"></i> @view.Name.Split(':')[2]</a></li>
+
+                                        }
+                                    }
+                                </ul>
+                            }
+                        }
+                    </li>
+                </ul>
+
+            </li>
+
+            <!-- ARV OPTIMIZATION SECTION -->
+            @* MG:25-Apr-2019 Make public *@
+            @*   MG:25-Apr-2019 Make public  <li id="live-dashboards" data-toggle="tooltip" data-placement="right" data-original-title="ARV Optimization" class="@Html.ShowAreaIf(true,UserType.Admin,UserType.Steward,UserType.Normal, UserType.GisAdmin)">*@
+            <li id="live-dashboards" data-toggle="tooltip" data-placement="right" data-original-title="ARV Optimization">
+                <a href="@Url.Action("Dashboard_1", "Dashboards")"><i class="fa fa-medkit"></i> <span class="nav-label" data-i18n="nav.dashboard">ARV Optimization</span> <span class="fa arrow"></span></a>
+                <ul class="nav nav-second-level collapse">
+
+                    <!--Overview-->
+                    @foreach (var workbook in Model)
+                    {
+                        if (@workbook.Name == "Danielson- 12 Month Retention")
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            foreach (var view in workbook.Views)
+                            {
+                                if (view.Name.ToLower().Contains("dashboard") &&
+                                    view.Name.ToLower().Contains("arv") &&
+                                    view.Name.ToLower().Contains("overview") && @view.Name.Contains(":"))
+                                {
+                                    <li id="@view.Id" onclick="loadDashboard('tableauImage', '@view.InteractiveUrl', '@view.Name')">
+                                        <a href="#">@view.Name.Split(':')[2]<span class="fa arrow"></span></a>
+                                    </li>
+
+                                }
+                            }
+                        }
+                    }
+                    <!--Regimen_Analysis-->
+                    <li>
+                        <a href="#" id="damian"> Regimen Analysis <span class="fa arrow"></span></a>
+                        @foreach (var workbook in Model)
+                        {
+                            if (@workbook.Name == "Danielson- 12 Month Retention")
+                            {
+                                continue;
+                            }
+                            else
+                            {
+                                <ul class="nav nav-third-level">
+                                    @foreach (var view in workbook.Views)
+                                    {
+                                        if (@view.Name.ToLower().Contains("dashboard") &&
+                                            @view.Name.ToLower().Contains("arv") &&
+                                            @view.Name.ToLower().Contains("regimen") &&
+                                            @view.Name.ToLower().Contains("analysis") && @view.Name.Contains(":"))
+                                        {
+                                            <li id="@view.Id" onclick="loadDashboard('tableauImage', '@view.InteractiveUrl', '@view.Name')"><a href="#"><i class="fa fa-caret-right" aria-hidden="true"></i> @view.Name.Split(':')[2]</a></li>
+
+                                        }
+                                    }
+                                </ul>
+                            }
+                        }
+                    </li>
+
+                    <!--Toxicity Monitoring-->
+                    <li>
+                        <a href="#" id="damian"> Toxicity Monitoring <span class="fa arrow"></span></a>
+                        @foreach (var workbook in Model)
+                        {
+                            if (@workbook.Name == "Danielson- 12 Month Retention")
+                            {
+                                continue;
+                            }
+                            else
+                            {
+                                <ul class="nav nav-third-level">
+                                    @foreach (var view in workbook.Views)
+                                    {
+                                        if (@view.Name.ToLower().Contains("dashboard") &&
+                                            @view.Name.ToLower().Contains("arv") &&
+                                            @view.Name.ToLower().Contains("toxicity") &&
+                                            @view.Name.ToLower().Contains("monitoring") && @view.Name.Contains(":"))
+                                        {
+                                            <li id="@view.Id" onclick="loadDashboard('tableauImage', '@view.InteractiveUrl', '@view.Name')"><a href="#"><i class="fa fa-caret-right" aria-hidden="true"></i> @view.Name.Split(':')[2]</a></li>
+
+                                        }
+                                    }
+                                </ul>
+                            }
+                        }
+                    </li>
+                </ul>
+            </li>
+            @* MG: 12-Jun-2019 *@
+            @*<!-- CBR SECTION -->
+                <li id="live-dashboards" data-toggle="tooltip" data-placement="right" data-original-title="Case Based Reporting (Demo)" class="@Html.ShowAreaIf(true,UserType.Admin,UserType.Steward,UserType.Normal, UserType.GisAdmin)">
+                    <a href="@Url.Action("Dashboard_1", "Dashboards")"><i class="fa fa-eye"></i> <span class="nav-label" data-i18n="nav.dashboard">Case Based Reporting (Demo)</span> <span class="fa arrow"></span></a>
+                    <ul class="nav nav-second-level collapse">
+
+                        <!--Overview-->
+                        @foreach (var workbook in Model)
+                        {
+                            if (@workbook.Name == "Danielson- 12 Month Retention")
+                            {
+                                continue;
+                            }
+                            else
+                            {
+                                foreach (var view in workbook.Views)
+                                {
+                                    if (view.Name.ToLower().Contains("dashboard") &&
+                                    view.Name.ToLower().Contains("cbr") &&
+                                    view.Name.ToLower().Contains("overview")  && @view.Name.Contains(":"))
+                                    {
+                                        <li id="@view.Id" onclick="loadDashboard('tableauImage', '@view.InteractiveUrl', '@view.Name')">
+                                            <a href="#">@view.Name.Split(':')[2]<span class="fa arrow"></span></a>
+                                        </li>
+
+                                    }
+                                }
+                            }
+                        }
+                    </ul>
+                </li>*@
+
+            <!-- HTS SECTION -->
+            @* MG: Make Public Access *@
+            @* <li id="live-dashboards" data-toggle="tooltip" data-placement="right" data-original-title="HTS" class="@Html.ShowAreaIf(true,UserType.Admin,UserType.Steward,UserType.Normal, UserType.GisAdmin)">*@
+            <li id="live-dashboards" data-toggle="tooltip" data-placement="right" data-original-title="HTS">
+                <a href="@Url.Action("Dashboard_1", "Dashboards")"><i class="fa fa-bullseye"></i> <span class="nav-label" data-i18n="nav.dashboard">HTS</span> <span class="fa arrow"></span></a>
+                <ul class="nav nav-second-level collapse">
+
+                    <!--Overview-->
+                    @foreach (var workbook in Model)
+                    {
+                        if (@workbook.Name == "Danielson- 12 Month Retention")
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            foreach (var view in workbook.Views)
+                            {
+                                if (view.Name.ToLower().Contains("dashboard") &&
+                                view.Name.ToLower().Contains("hts") &&
+                                view.Name.ToLower().Contains("overview") && @view.Name.Contains(":"))
+                                {
+                                    <li id="@view.Id" onclick="loadDashboard('tableauImage', '@view.InteractiveUrl', '@view.Name')">
+                                        <a href="#">@view.Name.Split(':')[2]<span class="fa arrow"></span></a>
+                                    </li>
+
+                                }
+                            }
+                        }
+                    }
+                </ul>
+            </li>
+			
+			
+			<!-- Service Desk -->
+            <li id="ServiceDesk-dashboards" data-toggle="tooltip" data-placement="right" data-original-title="Service Desk">
+                <a href="@Url.Action("Dashboard_1", "Dashboards")"><i class="fa fa-bar-chart"></i> <span class="nav-label" data-i18n="nav.dashboard">Service Desk</span> <span class="fa arrow"></span></a>
+                <ul class="nav nav-second-level collapse ">
+                    <!--General-->
+
+                    @foreach (var workbook in Model)
+                    {
+                        if (@workbook.Name == "Danielson- 12 Month Retention")
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            <ul class="nav nav-third-level">
+                                @foreach (var view in workbook.Views)
+                                {
+                                    if (@view.Name.ToLower().Contains("dashboard") &&
+                                        !@view.Name.ToLower().Contains("live") &&
+                                        @view.Name.ToLower().Contains("service") &&
+                                        @view.Name.ToLower().Contains("desk") && @view.Name.Contains(":"))
+                                    {
+                                        <li id="@view.Id" onclick="loadDashboard('tableauImage', '@view.InteractiveUrl', '@view.Name')"><a href="#"><i class="fa fa-caret-right" aria-hidden="true"></i> @(view.Name.Split(':').Length>2?@view.Name.Split(':')[2]:@view.Name.Split(':')[1])</a></li>
+
+                                    }
+                                }
+                            </ul>
+                        }
+                    }
+
+                </ul>
+
+            </li>
+
+            <!-- GIS -->
+            <li id="gis" data-toggle="tooltip" data-placement="right" data-original-title="GIS" class="@Html.ShowAreaIf(true,UserType.Admin,UserType.Steward,UserType.Normal, UserType.GisAdmin)">
+                <a href="@Url.Action("Dashboard_1", "Dashboards")"><i class="fa fa-map-marker" aria-hidden="true"></i> <span class="nav-label" data-i18n="nav.dashboard">GIS</span> <span class="fa arrow"></span></a>
+                <ul class="nav nav-second-level collapse ">
+
+                    @{
+                        var book = Model.FirstOrDefault();
+                        if (null != book)
+                        {
+                            var charts = book.GisCharts;
+                            <li>
+                                <a href="#" id="damian"> General <span class="fa arrow"></span></a>
+                                <ul class="nav nav-third-level">
+                                    @*<li><a onclick="loadMap()"><i aria-hidden="true"></i> Sample</a></li>*@
+                                    @foreach (var chart in charts.Where(n => n.Section == ChartSection.General))
+                                    {
+                                        <li id="@chart.Name" onclick="loadMap('@chart.Name', '@chart.Link', '@chart.Description')"><a href="#"><i class="fa fa-caret-right" aria-hidden="true"></i> @chart.Name</a></li>
+                                    }
+                                </ul>
+                            </li>
+                            <li>
+                                <a href="to#" id="damian"> Cohort <span class="fa arrow"></span></a>
+                                <ul class="nav nav-third-level">
+                                    @foreach (var chart in charts.Where(n => n.Section == ChartSection.Cohort))
+                                    {
+                                        <li id="@chart.Name" onclick="loadMap('@chart.Name', '@chart.Link', '@chart.Description')"><a href="#"><i class="fa fa-caret-right" aria-hidden="true"></i> @chart.Name</a></li>
+                                    }
+                                </ul>
+                            </li>
+                            <li>
+                                <a href="#" id="damian"> EMR Implementation Monitoring<span class="fa arrow"></span></a>
+                                <ul class="nav nav-third-level">
+                                    @foreach (var chart in charts.Where(n => n.Section == ChartSection.EmrImplementation))
+                                    {
+                                        <li id="@chart.Name" onclick="loadMap('@chart.Name', '@chart.Link', '@chart.Description')"><a href="#"><i class="fa fa-caret-right" aria-hidden="true"></i> @chart.Name</a></li>
+                                    }
+                                </ul>
+                            </li>
+                        }
+                    }
+                </ul>
+            </li>
+
+
+            <!-- AD HOC -->
+            <li id="adhoc" data-toggle="tooltip" data-placement="right" data-original-title="Adhoc" class="@Html.ShowAreaIf(true,UserType.Admin,UserType.Steward,UserType.Normal, UserType.GisAdmin)">
+                <a href="@Url.Action("Dashboard_1", "Dashboards")"><i class="fa fa-random" aria-hidden="true"></i> <span class="nav-label" data-i18n="nav.dashboard">Ad hoc</span> <span class="fa arrow"></span></a>
+                <ul class="nav nav-second-level collapse ">
+                    @*indicator name should match the controller action for the indicator on the dashboards controller*@
+                    @*<li><a href="@Url.Action("Adhoc", "Dashboards", new {indicator = "NewlyEnrolled"})"><i class="fa fa-caret-right" aria-hidden="true"></i> DATIM Fact Newly Enrolled</a></li>
+                        <li><a href="@Url.Action("Adhoc", "Dashboards", new {indicator = "NewlyEnrolledBaseline"})"><i class="fa fa-caret-right" aria-hidden="true"></i> DATIM Fact Newly Enrolled Baseline CD4</a></li>
+                        <li><a href="@Url.Action("Adhoc", "Dashboards", new {indicator = "ViralLoadMatrix"})"><i class="fa fa-caret-right" aria-hidden="true"></i> Fact Viral Load Matrix</a></li>*@
+                    <li><a href="@Url.Action("QueryBuilder", "Dashboards")"><i class="fa fa-caret-right" aria-hidden="true"></i> Custom Query</a></li>
+                </ul>
+            </li>
+
+            <!-- ADMINISTRATION -->
+            <li id="administration" data-toggle="tooltip" data-placement="right" data-original-title="Administration" class="@Html.ShowAreaIf(false,UserType.Admin,UserType.Steward, UserType.GisAdmin)">
+                <a href="@Url.Action("Dashboard_1", "Dashboards")"><i class="fa fa-cogs" aria-hidden="true"></i> <span class="nav-label" data-i18n="nav.dashboard">Administration</span> <span class="fa arrow"></span></a>
+                <ul class="nav nav-second-level collapse ">
+                    <li class="@Html.ShowAreaIf(false,UserType.Admin)"><a href="@Url.Action("Index", "OrganisationAccess")"><i class="fa fa-caret-right" aria-hidden="true"></i> Organizations</a></li>
+                    <li class="@Html.ShowAreaIf(false,UserType.Admin,UserType.Steward)"><a href="@Url.Action("Index", "Users")"><i class="fa fa-caret-right" aria-hidden="true"></i> Users</a></li>
+                    <li class="@Html.ShowAreaIf(false,UserType.Admin,UserType.GisAdmin)"><a href="@Url.Action("Index", "GisCharts")"><i class="fa fa-caret-right" aria-hidden="true"></i> GIS Charts</a></li>
+                </ul>
+            </li>
+
+            <!-- LINKS -->
+            <li id="usefulLinks" data-toggle="tooltip" data-placement="right" data-original-title="Useful Links">
+                <a href="@Url.Action("Index", "UsefulLinks")"><i class="fa fa-link" aria-hidden="true"></i> <span class="nav-label" data-i18n="nav.dashboard">Useful Links</span></a>
+            </li>
+
+            <!-- RESOURCES -->
+            <li id="resources" data-toggle="tooltip" data-placement="right" data-original-title="Resources">
+                <a href="@Url.Action("Index", "Resources")"><i class="fa fa-book" aria-hidden="true"></i> <span class="nav-label" data-i18n="nav.dashboard">Resources</span></a>
+            </li>
+
+
+            <!-- ABOUT -->
+            <li id="about" data-toggle="tooltip" data-placement="right" data-original-title="About">
+                <a href="@Url.Action("Index", "About")"><i class="fa fa-info" aria-hidden="true"></i> <span class="nav-label" data-i18n="nav.dashboard">About</span></a>
+            </li>
+
+            <li class="hidden">
+                <a href="@Url.Action("Dashboard_1", "Dashboards")"><i class="fa fa-th-large"></i> <span class="nav-label" data-i18n="nav.dashboard">Other views</span> <span class="fa arrow"></span></a>
+                @foreach (var workbook in Model)
+                {
+                    if (@workbook.Name == "Danielson- 12 Month Retention")
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        <ul class="nav nav-second-level collapse @Html.IsSelected(controller: "Dashboards", cssClass: "in")" id="other-views">
+
+
+                            @foreach (var view in workbook.Views)
+                            {
+
+                                if (!@view.Name.ToLower().Contains("dashboard"))
+                                {
+                                    views += @view.Name + " - " + @view.InteractiveUrl + " - " + @view.Id + "nextView";
+                                }
+
+                            }
+
+                        </ul>
+                    }
+                }
+            </li>
+        </ul>
+    </div>
+    <div class="hidden">
+        <div id="otherViews" class="form-group">
+            <select id="views" class="chosen-select" multiple data-placeholder="Add chart(s)..."></select>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+    function prepareViewsOptions(views) {
+        var viewsArr = views.split('nextView');
+        var options = [];
+        viewsArr.forEach(function (view) {
+            var viewName = view.split(' - ')[0];
+            var viewUrl = view.split(' - ')[1];
+            var viewId = view.split(' - ')[2];
+            var option = document.createElement('option');
+            option.value = viewUrl;
+            option.id = viewId;
+            option.innerHTML = viewName;
+            if (viewName.toLowerCase().indexOf('stripe') > -1 || viewName.toLowerCase().indexOf('img') > -1) {
+                //skip these, i.e. dont add to array
+                return;
+            }
+            options.push(option);
+        });
+
+        return options;
+    }
+
+    function loadViewsSelect(options) {
+        select = document.getElementById('views');
+        options.forEach(function (option) {
+            select.appendChild(option);
+        });
+    }
+
+    loadViewsSelect(prepareViewsOptions('@views'));
+    localStorage.setItem('orgName', '@ViewBag.Org')
+
+
+    </script>
+
+</nav>
