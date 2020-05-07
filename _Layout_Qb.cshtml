@@ -1,0 +1,129 @@
+﻿@using DWHDashboard.Web.Helpers
+@using log4net.Util
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>National Data Warehouse | @ViewBag.Title</title>
+    <!--gis-->
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/leaflet@1.0.2/dist/leaflet.css">
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/leaflet.markercluster@1.0.0/dist/MarkerCluster.css">
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/leaflet.markercluster@1.0.0/dist/MarkerCluster.Default.css">
+
+    <script type="text/javascript" src="https://unpkg.com/leaflet@1.0.2/dist/leaflet.js"></script>
+    <script type="text/javascript" src="https://unpkg.com/leaflet.markercluster@1.0.0/dist/leaflet.markercluster.js"></script>
+
+    <link rel="apple-touch-icon" sizes="57x57" href="/Images/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="/Images/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/Images/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="/Images/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="/Images/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/Images/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="/Images/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/Images/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/Images/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/Images/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/Images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/Images/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/Images/favicon-16x16.png">
+    <link rel="manifest" href="/Images/manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="/Images/ms-icon-144x144.png">
+    <meta name="theme-color" content="#ffffff">
+
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700' rel='stylesheet' type='text/css'>
+    <!-- Add local styles, mostly for plugins css file -->
+    @if (IsSectionDefined("Styles"))
+    {@RenderSection("Styles", required: false)}
+     
+     <!-- Add jQuery Style direct - used for jQGrid plugin -->
+     <link href="@Url.Content("~/Scripts/plugins/jquery-ui/jquery-ui.min.css")" rel="stylesheet" type="text/css" />
+
+     <link href="@Url.Content("~/Scripts/plugins/jquery-ui/jquery-ui.min.css")" rel="stylesheet" type="text/css" />
+        
+     <!-- Primary Inspinia style -->     
+     @Styles.Render("~/Content/css")
+     @Styles.Render("~/fonts/font-awesome/css/css")
+     @Styles.Render("~/Content/plugins/chosen/chosenStyles")
+     @*<link href="~/fonts/font-awesome/css/font-awesome.css" rel="stylesheet" />*@
+     
+     @Scripts.Render("~/bundles/jquery")
+     
+     <script>
+         $(function () {
+             $('#qb-ui').resizable({ handles: "s" });
+             $('#qb-ui-canvas').resizable({ handles: "s" });
+             $('#qb-ui-tree-view').resizable({ handles: "e" });
+         });
+     </script>
+     <script src="@Html.TableauJs()"></script>
+    
+     </head>
+     <body>
+
+     <!-- Skin configuration box -->
+     <!-- @Html.Partial("_SkinConfig") -->
+
+     <!-- Wrapper-->
+     <!-- PageClass give you ability to specify custom style for specific view based on action -->
+     <div id="wrapper" class="@Html.PageClass()">
+         <!-- Navigation -->
+         @Html.Partial("_Navigation", ViewData["workbooks"])
+
+         <!-- Page wraper -->
+         <div id="page-wrapper" class="gray-bg @ViewBag.SpecialClass">
+
+             <!-- Top Navbar -->
+             @Html.Partial("_TopNavbar")
+
+             <!-- Main view  -->
+             @RenderBody()
+
+             <!-- Footer -->
+             @Html.Partial("_Footer")
+
+         </div>
+         <!-- End page wrapper-->
+
+         <!-- Right Sidebar -->
+         @Html.Partial("_RightSidebar")
+
+     </div>
+     <!-- End wrapper-->
+
+     <!-- Section for main scripts render -->
+     @Scripts.Render("~/bundles/bootstrap")
+     @Scripts.Render("~/plugins/slimScroll")
+     @Scripts.Render("~/bundles/inspinia")
+    
+     @Scripts.Render("~/plugins/peity")
+
+     @Scripts.Render("~/plugins/flot")
+
+     @Scripts.Render("~/plugins/sparkline")
+
+     @Scripts.Render("~/plugins/touchPunch")
+     @Scripts.Render("~/plugins/iCheck")
+
+     <!-- Skin config script - only for demo purpose-->
+     @Scripts.Render("~/bundles/skinConfig")
+
+     @Scripts.Render("~/plugins/chosen")
+    
+     <!-- Handler for local scripts -->
+     @RenderSection("scripts", required: false)
+    
+     <script type="text/javascript">
+         $('#hideempty:empty').parent().hide();
+         $( function() {
+             $("#startDate").datepicker();
+             $("#endDate").datepicker();
+         } );
+     </script>
+     </body>
+     </html>
+
