@@ -1,0 +1,47 @@
+﻿@using DWHDashboard.Web.Helpers
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>National DataWarehouse | Error</title>
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet">
+    <link href="~/Fonts/font-awesome/css/font-awesome.css" rel="stylesheet">
+    <link href="~/Content/animate.css" rel="stylesheet">
+    <link href="~/Content/style.css" rel="stylesheet">
+</head>
+<body class="gray-bg">
+    <div class="middle-box text-center loginscreen   animated fadeInDown">
+        <div class="row">
+            <div class="col-md-12">
+                <h3 class="font-bold"></h3>
+
+                <p>
+                    <img src="~/Images/org/dwh2.png" class="img-responsive center-block">
+                </p>
+            </div>
+            <hgroup class="title">
+                <h3 class="text-danger">Error!</h3>
+            </hgroup>
+            <div>
+                @{
+                    if (String.IsNullOrEmpty(ViewBag.errorMessage))
+                    {
+                        <p class="text-danger">An error occurred while processing your request.</p>
+                    }
+                    else
+                    {
+                        <p class="text-danger">@ViewBag.errorMessage</p>
+                    }
+                }
+            </div>
+            <p class="text-muted text-center"><small>Go to login?</small></p>
+            @Html.ActionLink("Login", "Login", "Account","", new { @class = "btn btn-sm btn-white btn-block" })
+        </div>
+        <p class="m-t"> <small>&copy; 2017 Palladium <img src="~/Images/org/palladiumlogo2.png" alt="Palladium" /></small> </p>
+    </div>
+</body>
+</html>
