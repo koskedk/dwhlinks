@@ -409,6 +409,39 @@
 
             </li>
 
+              <!-- COP -->
+            <li id="COP-dashboards" data-toggle="tooltip" data-placement="right" data-original-title="COP19 Priorities">
+                        <a href="@Url.Action("Dashboard_1", "Dashboards")"><i class="fa fa-cube"></i> <span class="nav-label" data-i18n="nav.dashboard">COP19 Priorities</span> <span class="fa arrow"></span></a>
+                        <ul class="nav nav-second-level collapse ">
+                            <!--General-->
+
+                            @foreach (var workbook in Model)
+                            {
+                                if (@workbook.Name == "Danielson- 12 Month Retention")
+                                {
+                                    continue;
+                                }
+                                else
+                                {
+                                    <ul class="nav nav-third-level">
+                                        @foreach (var view in workbook.Views)
+                                        {
+                                            if (@view.Name.ToLower().Contains("dashboard") &&
+                                                @view.Name.ToLower().Contains("cop19") &&
+                                                @view.Name.Contains(":"))
+                                            {
+                                                <li id="@view.Id" onclick="loadDashboard('tableauImage', '@view.InteractiveUrl', '@view.Name')"><a href="#"><i class="fa fa-caret-right" aria-hidden="true"></i> @(view.Name.Split(':').Length>2?@view.Name.Split(':')[2]:@view.Name.Split(':')[1])</a></li>
+
+                                            }
+                                        }
+                                    </ul>
+                                }
+                            }
+
+                        </ul>
+
+            </li>
+
 			<!-- ARV OPTIMIZATION SECTION -->
             @* MG:25-Apr-2019 Make public *@
             @*   MG:25-Apr-2019 Make public  <li id="live-dashboards" data-toggle="tooltip" data-placement="right" data-original-title="ARV Optimization" class="@Html.ShowAreaIf(true,UserType.Admin,UserType.Steward,UserType.Normal, UserType.GisAdmin)">*@
